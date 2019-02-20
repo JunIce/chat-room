@@ -4,17 +4,16 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 module.exports = {
-    entry: './index.js',
+    entry: path.resolve(__dirname, '../index.js'),
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, '../dist'),
         filename: '[name].[hash:7].js'
     },
-    mode: 'development',
     resolve: {
         extensions: ['.js', '.vue'],
         alias: {
             'vue$': 'vue/dist/vue.esm.js',
-            '@': path.resolve(__dirname, 'src')
+            '@': path.resolve(__dirname, '../src')
         }
     },
     module: {
@@ -29,17 +28,20 @@ module.exports = {
                 loader: 'vue-loader',
                 options: {
                     loaders: {
-                        'css': [
-                            'vue-style-loader',
-                            'css-loader'
-                        ]
+                        css: ExtractTextPlugin.extract({ 
+                            fallback: 'vue-style-loader', 
+                            use: 'css-loader' 
+                        })
                     }
                 }
             },
             {
                 test: /\.css$/,
-                use: ExtractTextPlugin.extract('vue-style-loader', 'css-loader')
-            },
+                use: ExtractTextPlugin.extract({
+                  fallback: "style-loader",
+                  use: "css-loader"
+                })
+              },
             {
                 test: /\.(png|jpg|gif|svg)$/,
                 loader: 'url-loader',
@@ -58,15 +60,9 @@ module.exports = {
             }
         ]
     },
-    devServer: {
-        contentBase: path.join(__dirname, "dist"),
-        compress: true,
-        port: 9020,
-        hot: true
-    },
     plugins: [
         new HtmlWebpackPlugin({
-            template: path.resolve(__dirname, 'index.html')
+            template: path.resolve(__dirname, '../index.html')
         }),
         new VueLoaderPlugin,
         new ExtractTextPlugin("styles.css")
